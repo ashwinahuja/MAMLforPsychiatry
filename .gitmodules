@@ -1,6 +1,0 @@
-[submodule "R250-Report"]
-	path = R250-Report
-	url = git@github.com:ashwinahuja/R250-Report.git
-[submodule "603f8b9af63f7c641781ef42"]
-	path = 603f8b9af63f7c641781ef42
-	url = https://git.overleaf.com/603f8b9af63f7c641781ef42
