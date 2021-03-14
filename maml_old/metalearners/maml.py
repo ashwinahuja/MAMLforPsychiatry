@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from collections import OrderedDict
 from torchmeta.utils import gradient_update_parameters
-from maml.utils import tensors_to_device, compute_accuracy, compute_precision, compute_recall
+from maml.utils import tensors_to_device, compute_accuracy
 
 __all__ = ['ModelAgnosticMetaLearning', 'MAML', 'FOMAML']
 
@@ -151,9 +151,7 @@ class ModelAgnosticMetaLearning(object):
             'outer_losses': np.zeros((num_tasks,), dtype=np.float32),
             'mean_outer_loss': 0.,
             'accuracies_before': np.zeros((num_tasks,), dtype=np.float32),
-            'accuracies_after': np.zeros((num_tasks,), dtype=np.float32),
-            'precision': np.zeros((num_tasks,), dtype=np.float32),
-            'recall': np.zeros((num_tasks,), dtype=np.float32)
+            'accuracies_after': np.zeros((num_tasks,), dtype=np.float32)
         }
         
         is_classification_task = True
@@ -173,7 +171,7 @@ class ModelAgnosticMetaLearning(object):
 
             results['inner_losses'][:, cat] = adaptation_results['inner_losses']
             results['accuracies_before'][cat] = adaptation_results['accuracy_before']
-            
+
             with torch.set_grad_enabled(self.model.training):
                 test_logits = self.model(test_inputs)
                 outer_loss = self.loss_function(test_logits, test_targets)
@@ -181,9 +179,6 @@ class ModelAgnosticMetaLearning(object):
                 mean_outer_loss += outer_loss
 
             results['accuracies_after'][cat] = compute_accuracy(test_logits, test_targets)
-            results['precision'][cat] = compute_precision(test_logits, test_targets)
-            results['recall'][cat] = compute_recall(test_logits, test_targets)
-            
 
         mean_outer_loss.div_(num_tasks)
         results['mean_outer_loss'] = mean_outer_loss.item()
@@ -206,42 +201,31 @@ class ModelAgnosticMetaLearning(object):
 
             if (step == 0) and is_classification_task:
                 results['accuracy_before'] = compute_accuracy(logits, targets)
-                results['precision'] = compute_precision(logits, targets)
-                results['recall'] = compute_recall(logits, targets)
 
             self.model.zero_grad()
-            
             params = gradient_update_parameters(self.model, inner_loss,
-                step_size=step_size, params=params, 
+                step_size=step_size, params=params,
                 first_order=(not self.model.training) or first_order)
 
-            
         return params, results
 
-    def train(self, d, eval = False, max_batches=500, verbose=True, **kwargs):
-        results = self.train_iter(d, eval)
+    def train(self, d, max_batches=500, verbose=True, **kwargs):
+        results = self.train_iter(d)
         postfix = {'loss': '{0:.4f}'.format(results['mean_outer_loss'])}
         if 'accuracies_after' in results:
             postfix['accuracy'] = '{0:.4f}'.format(
             np.mean(results['accuracies_after']))
         return results
 
-    def train_iter(self, d, eval=False, max_batches=500):
-        if(not eval):
-            self.model.train()
-
-            self.optimizer.zero_grad()
+    def train_iter(self, d, max_batches=500):
+        self.model.train()
         
-            outer_loss, results = self.get_outer_loss2(d)
+        self.optimizer.zero_grad()
+        
+        outer_loss, results = self.get_outer_loss2(d)
                 
-            outer_loss.backward()
-            self.optimizer.step()
-
-        else:
-            self.model.eval()
-            outer_loss, results = self.get_outer_loss2(d)
-        
-        
+        outer_loss.backward()
+        self.optimizer.step()
 
         return results
 

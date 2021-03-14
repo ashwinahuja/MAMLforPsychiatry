@@ -2,34 +2,14 @@ import torch
 
 from collections import OrderedDict
 from torchmeta.modules import MetaModule
-from sklearn.metrics import *
+
 
 def compute_accuracy(logits, targets):
     """Compute the accuracy"""
     with torch.no_grad():
         _, predictions = torch.max(logits, dim=1)
-
-        #accuracy = torch.mean(predictions.eq(targets).float())
-        a = accuracy_score(targets, predictions)
-    return a
-
-def compute_precision(logits, targets):
-    """Compute the accuracy"""
-    with torch.no_grad():
-        _, predictions = torch.max(logits, dim=1)
-
-        #accuracy = torch.mean(predictions.eq(targets).float())
-        a = precision_score(targets, predictions, zero_division=0)
-    return a
-
-def compute_recall(logits, targets):
-    """Compute the accuracy"""
-    with torch.no_grad():
-        _, predictions = torch.max(logits, dim=1)
-
-        #accuracy = torch.mean(predictions.eq(targets).float())
-        a = recall_score(targets, predictions, zero_division=0)
-    return a
+        accuracy = torch.mean(predictions.eq(targets).float())
+    return accuracy.item()
 
 def tensors_to_device(tensors, device=torch.device('cpu')):
     """Place a collection of tensors in a specific device"""

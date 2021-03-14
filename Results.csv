@@ -1,0 +1,7 @@
+,,All Data,,,20s,,,30s,,,40s,,,50s,,
+,,Mean Diagnosis Accuracy / %,Precision,Recall,Mean Diagnosis Accuracy / %,Precision,Recall,Mean Diagnosis Accuracy / %,Precision,Recall,Mean Diagnosis Accuracy / %,Precision,Recall,Mean Diagnosis Accuracy / %,Precision,Recall
+SVM,Flattened,60.6 (15.5),,,66.7 (15.8),,,66.7 (28.6),,,43.3 (35.1),,,63.3 (30.7),,
+,k-means clustering,67.0 (12.6),,,76.7 (17.8),,,60.0 (33.5),,,70.0 (30),,,63.3 (26.7),,
+,t-SNE and k-means clustering,63.2 (6.4),,,67.5 (25.1),,,60 (37.4),,,76.7 (23.8),,,60.0 (31.8),,
+Convolutional Neural Network,,55.9,55.9,100,72.7,72.7,100,71.4,66.7,100,65,65,100,66.7,66.7,100
+Meta-Learning (Convolutional Neural Network) ,,79.2,79.2,100,N/A,,,,,,,,,,,
